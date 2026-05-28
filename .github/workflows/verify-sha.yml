@@ -1,0 +1,42 @@
+name: Verify Commit SHA
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-sha-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-sha:
+    name: Verify pushed commit SHA
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Confirm GitHub SHA matches checked out HEAD
+        shell: bash
+        run: |
+          set -euo pipefail
+          head_sha="$(git rev-parse HEAD)"
+          echo "GitHub SHA: ${GITHUB_SHA}"
+          echo "Checked out HEAD: ${head_sha}"
+          test "${head_sha}" = "${GITHUB_SHA}"
+
+      - name: Verify commit object exists
+        shell: bash
+        run: git cat-file -e "${GITHUB_SHA}^{commit}"
+
+      - name: Verify repository connectivity
+        shell: bash
+        run: git fsck --no-progress --connectivity-only
