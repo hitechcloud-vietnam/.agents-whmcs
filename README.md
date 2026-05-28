@@ -1,33 +1,15 @@
-# .agents-whmcs - WHMCS Agent Configuration
+# .agents-whmcs - WHMCS DevKit Agent
 
-**Purpose:** WHMCS module development configurations and guides for HiTechCloud DevKits.
+**Purpose:** Autonomous agent configuration for WHMCS module development.
 
 **Owner:** Pho Tue SoftWare And Technology Solutions JSC (MST: 0318222203)
+**Version:** 1.0 | **Updated:** 2026-05-28
 
 ---
 
-## Quick Start
+## Agent Overview
 
-### Read First
-1. [CLAUDE.md](CLAUDE.md) - Technical Reference (mandatory)
-2. [docs/module-groups.md](docs/module-groups.md) - Module type overview
-
-### Choose Your Module Type
-
-| Type | Workflow | When to Use |
-|------|----------|-------------|
-| Server/Provisioning | [workflows/server-provisioning-module.md](workflows/server-provisioning-module.md) | VPS, Cloud, Dedicated hosting |
-| Payment Gateway | [workflows/payment-gateway-module.md](workflows/payment-gateway-module.md) | Payment collection |
-| Domain Registrar | [workflows/registrar-module.md](workflows/registrar-module.md) | Domain registration/transfer |
-| Addon Module | [workflows/addon-module.md](workflows/addon-module.md) | Admin tools, client area |
-| Notification | [workflows/notification-provider.md](workflows/notification-provider.md) | SMS, Push notifications |
-
-### Available Skills
-
-| Skill | Purpose |
-|-------|---------|
-| [skills/whmcs-core-reader/](skills/whmcs-core-reader/SKILL.md) | Reading WHMCS sample modules |
-| [skills/whmcs-validator/](skills/whmcs-validator/SKILL.md) | Validating WHMCS modules |
+This is an independent agent system dedicated exclusively to WHMCS module development. The agent focuses ONLY on reading, coding, and supplementing skills/workflows/devkits - no references to external core or sample directories.
 
 ---
 
@@ -35,120 +17,217 @@
 
 ```
 .agents-whmcs/
-├── CLAUDE.md                           ← Main technical reference
-├── docs/
-│   └── module-groups.md               ← Module type overview
-├── workflows/
-│   ├── server-provisioning-module.md  ← Provisioning module guide
-│   ├── payment-gateway-module.md       ← Payment gateway guide
-│   ├── registrar-module.md             ← Domain registrar guide
-│   ├── addon-module.md                 ← Addon module guide
-│   └── notification-provider.md        ← Notification provider guide
-├── skills/
-│   ├── whmcs-core-reader/             ← How to read WHMCS core
-│   └── whmcs-validator/               ← Module validation guide
-└── README.md                          ← This file
+├── CLAUDE.md                    ← Main technical reference
+├── README.md                   ← This file
+├── devkits/                     ← Complete module templates
+│   ├── provisioning-module/    ← Server module template
+│   ├── gateway-module/         ← Payment gateway template
+│   ├── registrar-module/       ← Domain registrar template
+│   ├── addon-module/           ← Addon module template
+│   └── notification-module/    ← Notification provider template
+├── docs/                       ← Reference documentation
+│   └── module-groups.md        ← Module type overview
+├── workflows/                  ← Step-by-step development guides
+│   ├── server-provisioning-module.md
+│   ├── payment-gateway-module.md
+│   ├── registrar-module.md
+│   ├── addon-module.md
+│   ├── notification-provider.md
+│   ├── whmcs-docker-deployment.md
+│   ├── whmcs-marketplace-submission.md
+│   └── whmcs-provisioning-automation.md
+└── skills/                     ← 56 specialized development skills
+    ├── whmcs-server-builder/
+    ├── whmcs-gateway-builder/
+    ├── whmcs-registrar-builder/
+    ├── whmcs-addon-builder/
+    ├── whmcs-notification-builder/
+    └── ... (51 more skills)
 ```
 
 ---
 
-## Module Development Flow
+## Quick Start
+
+### Step 1: Identify Module Type
+
+| Type | Path | Description |
+|------|------|-------------|
+| Provisioning | `devkits/provisioning-module/` | VPS, Cloud, Dedicated server |
+| Gateway | `devkits/gateway-module/` | Payment collection |
+| Registrar | `devkits/registrar-module/` | Domain registration/management |
+| Addon | `devkits/addon-module/` | Admin tools, client area pages |
+| Notification | `devkits/notification-module/` | SMS, Push, Chat notifications |
+
+### Step 2: Read Technical Reference
+
+**Always read CLAUDE.md first** for:
+- WHMCS coding standards
+- Module function signatures
+- Return value patterns
+- Security requirements
+- Database patterns (Capsule)
+
+### Step 3: Reference Relevant Skill
+
+Skills provide deep-dive patterns, templates, and checklists for specific development tasks.
+
+---
+
+## Development Flow
 
 ```
 1. Identify Module Type
-   ↓
-2. Read CLAUDE.md
-   ↓
-3. Read corresponding workflow
-   ↓
-4. Read sample modules in Core_exapm_whmcs/
-   ↓
-5. Create module in module_dev_whmcs/
-   ↓
-6. Validate with whmcs-validator skill
-   ↓
-7. Test in WHMCS installation
+       ↓
+2. Read CLAUDE.md (mandatory)
+       ↓
+3. Read corresponding devkit
+       ↓
+4. Reference relevant workflow/guide
+       ↓
+5. Check specific skill for patterns
+       ↓
+6. Build module code
+       ↓
+7. Validate and test
 ```
 
 ---
 
-## Reference Locations
+## Available DevKits (5)
 
-### Read Only (Do not modify)
-```
-Core_exapm_whmcs/                 ← WHMCS official samples
-module_done_whmcs/                ← Completed WHMCS modules
-```
+### 1. Provisioning Module
+Complete server module template with:
+- All lifecycle functions (Create, Suspend, Terminate, etc.)
+- API Client skeleton
+- Client area template
+- Checklist
 
-### Development Output
-```
-module_dev_whmcs/                 ← Write WHMCS modules here
-```
-
----
-
-## Module Types Summary
-
-### Server/Provisioning (modules/servers/)
-Automated hosting service provisioning
-- Create, Suspend, Unsuspend, Terminate
-- Password change, Package change
-
-### Payment Gateway (modules/gateways/)
-Payment collection
+### 2. Gateway Module
+Payment gateway templates (5 types):
 - Standard redirect
 - Merchant capture
 - Tokenization
 - Remote input (iframe)
-- Remote bank
+- Callback handler
 
-### Registrar (modules/registrars/)
-Domain management
-- Register, Transfer, Renew
-- Nameservers, Contacts
-- Lock, EPP codes
+### 3. Registrar Module
+Domain registrar template with:
+- All domain functions
+- EPP code handling
+- DNSSEC management
+- DNS management
+- Sync functionality
 
-### Addon (modules/addons/)
-Admin tools and client pages
-- Database tables (mod_ prefix)
+### 4. Addon Module
+Addon module template with:
+- Database setup (activate/deactivate)
+- Upgrade/migration patterns
 - Admin output with CSRF
-- Client area
+- Client area template
+- Sidebar hooks
 
-### Notification (modules/notifications/)
-SMS/Push notifications
-- use DescriptionTrait (REQUIRED)
-- throw Exception on errors
-
----
-
-## Key WHMCS Conventions
-
-### Naming
-- File: `{module}.php` or `{module}/{module}.php`
-- Functions: `{module}_FunctionName()`
-- Tables: `mod_{module}_table_name`
-
-### Return Values
-- Server: `'success'` or error string
-- Registrar: `['success' => true]` or `['error' => '...']`
-- Notification: throw Exception (NOT return false)
-
-### Security
-- CSRF: `check_token()` on all POST
-- Tables: Prefix with `mod_`
-- Input: Sanitize all user data
+### 5. Notification Module
+Notification provider template with:
+- Provider class with DescriptionTrait
+- API Client skeleton
+- Test connection pattern
+- Send notification logic
+- whmcs.json metadata
 
 ---
 
-## Common Issues
+## Available Skills (56)
 
-| Issue | Solution |
-|-------|----------|
-| Module not showing | Check file naming, use DescriptionTrait for notification |
-| Activation fails | Verify table names have `mod_` prefix |
-| Function not called | Check function naming matches file name |
-| Callback fails | Verify signature validation, IP whitelist |
+### Core Development
+- `whmcs-core-reader` - WHMCS module patterns reading
+- `whmcs-validator` - Module validation
+- `whmcs-server-builder` - Provisioning modules
+- `whmcs-gateway-builder` - Payment gateways
+- `whmcs-registrar-builder` - Domain registrars
+- `whmcs-addon-builder` - Addon modules
+- `whmcs-notification-builder` - Notifications
+
+### Development Tools
+- `whmcs-api-integration` - API integration patterns
+- `whmcs-api-documentation` - API documentation
+- `whmcs-hooks-development` - Hook system
+- `whmcs-ajax-patterns` - AJAX in WHMCS
+
+### Client & Admin UI
+- `whmcs-clientarea-builder` - Client area pages
+- `whmcs-admin-ui-builder` - Admin interfaces
+- `whmcs-template-styling` - Smarty templates
+- `whmcs-widget-builder` - Dashboard widgets
+
+### Data & Storage
+- `whmcs-database-design` - Table design
+- `whmcs-migration-guide` - Database migrations
+- `whmcs-configuration-management` - Settings management
+
+### Operations
+- `whmcs-cron-automation` - Cron jobs
+- `whmcs-logging` - Logging patterns
+- `whmcs-error-handling` - Error handling
+- `whmcs-backup-restore` - Backup/restore
+
+### Security & Quality
+- `whmcs-security-hardening` - Security hardening
+- `whmcs-testing-qa` - Testing patterns
+- `whmcs-performance-optimization` - Performance tips
+
+### Integrations
+- `whmcs-vietnamese-payment-builder` - VNPay, MoMo, ZaloPay
+- `whmcs-ssl-certificate-module` - SSL provisioning
+- `whmcs-domain-sync` - Domain synchronization
+- `whmcs-einvoice-integration` - E-invoice integration
+- `whmcs-webhook-handler` - Webhooks
+
+### Business Features
+- `whmcs-subscription-billing` - Subscription billing
+- `whmcs-affiliate-module` - Affiliate tracking
+- `whmcs-reporting` - Reporting/analytics
+- `whmcs-fraud-detection` - Fraud detection
+
+### Support & Communication
+- `whmcs-sms-notification-builder` - SMS notifications
+- `whmcs-email-template-builder` - Email templates
+- `whmcs-support-ticket-module` - Ticket management
+
+### Specialized Modules
+- `whmcs-license-module-builder` - License provisioning
+- `whmcs-cloudflare-module` - Cloudflare DNS
+- `whmcs-reseller-module` - Reseller hosting
+- `whmcs-inventory-manager` - Inventory management
+- `whmcs-product-configurator` - Product builder
+- `whmcs-remote-import` - Data import
+- `whmcs-service-billing` - Billing management
+- `whmcs-cost-calculator` - Cost calculators
 
 ---
 
-**Version:** 1.0 | **Updated:** 2026-05-28
+## Keywords
+
+Use these keywords when working with this agent:
+
+- "Tạo module WHMCS" - Create WHMCS module
+- "Bổ sung chức năng" - Add functionality  
+- "Module mới" - New module
+- "Debug module" - Debug module
+- "Validate module" - Validate module
+
+---
+
+## Agent Rules
+
+1. **ONLY reference files within .agents-whmcs/**
+2. **Do NOT mention external directories** (Core_exapm_whmcs/, module_done_whmcs/, etc.)
+3. **Focus on skills, workflows, docs, and devkits**
+4. **Always read CLAUDE.md before coding**
+5. **Return error string for server modules, array for registrar, exception for notification**
+
+---
+
+## Contact
+
+**Owner:** Pho Tue SoftWare And Technology Solutions JSC (MST: 0318222203)
