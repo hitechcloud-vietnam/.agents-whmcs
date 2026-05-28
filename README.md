@@ -19,31 +19,23 @@ This is an independent agent system dedicated exclusively to WHMCS module develo
 .agents-whmcs/
 ├── CLAUDE.md                    ← Main technical reference
 ├── README.md                   ← This file
-├── devkits/                     ← Complete module templates
-│   ├── provisioning-module/    ← Server module template
-│   ├── gateway-module/         ← Payment gateway template
-│   ├── registrar-module/       ← Domain registrar template
-│   ├── addon-module/           ← Addon module template
-│   └── notification-module/    ← Notification provider template
-├── docs/                       ← Reference documentation
-│   └── module-groups.md        ← Module type overview
-├── workflows/                  ← Step-by-step development guides
-│   ├── server-provisioning-module.md
-│   ├── payment-gateway-module.md
-│   ├── registrar-module.md
-│   ├── addon-module.md
-│   ├── notification-provider.md
-│   ├── whmcs-docker-deployment.md
-│   ├── whmcs-marketplace-submission.md
-│   └── whmcs-provisioning-automation.md
-└── skills/                     ← 56 specialized development skills
-    ├── whmcs-server-builder/
-    ├── whmcs-gateway-builder/
-    ├── whmcs-registrar-builder/
-    ├── whmcs-addon-builder/
-    ├── whmcs-notification-builder/
-    └── ... (51 more skills)
+├── devkits/                     ← Complete module templates (24)
+├── docs/                       ← Reference documentation (28)
+├── workflows/                  ← Step-by-step development guides (35)
+└── skills/                     ← Specialized development skills (107)
 ```
+
+---
+
+## Quick Reference
+
+| Category | Count | Description |
+|----------|-------|-------------|
+| DevKits | 24 | Complete module templates |
+| Skills | 107 | Specialized development guides |
+| Workflows | 35 | Step-by-step processes |
+| Docs | 28 | Reference documentation |
+| **Total** | **194** | WHMCS development resources |
 
 ---
 
@@ -94,50 +86,39 @@ Skills provide deep-dive patterns, templates, and checklists for specific develo
 
 ---
 
-## Available DevKits (5)
+## Available DevKits (24)
 
-### 1. Provisioning Module
-Complete server module template with:
-- All lifecycle functions (Create, Suspend, Terminate, etc.)
-- API Client skeleton
-- Client area template
-- Checklist
+### Core Modules
+1. **Provisioning Module** - Server/VPS/cloud provisioning
+2. **Gateway Module** - Payment gateway (5 types)
+3. **Registrar Module** - Domain registrar
+4. **Addon Module** - Admin/client tools
+5. **Notification Module** - Notifications provider
 
-### 2. Gateway Module
-Payment gateway templates (5 types):
-- Standard redirect
-- Merchant capture
-- Tokenization
-- Remote input (iframe)
-- Callback handler
-
-### 3. Registrar Module
-Domain registrar template with:
-- All domain functions
-- EPP code handling
-- DNSSEC management
-- DNS management
-- Sync functionality
-
-### 4. Addon Module
-Addon module template with:
-- Database setup (activate/deactivate)
-- Upgrade/migration patterns
-- Admin output with CSRF
-- Client area template
-- Sidebar hooks
-
-### 5. Notification Module
-Notification provider template with:
-- Provider class with DescriptionTrait
-- API Client skeleton
-- Test connection pattern
-- Send notification logic
-- whmcs.json metadata
+### Advanced Modules
+6. **Hooks Module** - Custom hook development
+7. **Widget Module** - Dashboard widgets
+8. **Reporting Module** - Reports generation
+9. **SMTP Module** - Email delivery
+10. **Import Module** - Data import tools
+11. **Export Module** - Data export
+12. **Sync Module** - Synchronization
+13. **SSO Module** - Single sign-on
+14. **API Module** - REST API endpoints
+15. **CDN Module** - CDN integration
+16. **Live Chat Module** - Chat integration
+17. **Knowledge Base Module** - KB system
+18. **SMS Module** - SMS gateway
+19. **Email Module** - Custom email
+20. **Fraud Module** - Fraud detection
+21. **Affiliate Module** - Affiliate tracking
+22. **Support Module** - Helpdesk system
+23. **Reviews Module** - Product reviews
+24. **Backup Module** - Backup system
 
 ---
 
-## Available Skills (56)
+## Available Skills (107)
 
 ### Core Development
 - `whmcs-core-reader` - WHMCS module patterns reading
