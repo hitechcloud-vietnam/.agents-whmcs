@@ -2,8 +2,18 @@
 
 **Purpose:** Autonomous agent configuration for WHMCS module development.
 
-**Owner:** Pho Tue SoftWare And Technology Solutions JSC (MST: 0318222203)
+**Owner:** Pho Tue SoftWare And Technology Solutions Joint Stock Company (Tax Code: 0318222903)
 **Version:** 1.0 | **Updated:** 2026-05-28
+
+**Legal Entity:** CÔNG TY CỔ PHẦN GIẢI PHÁP CÔNG NGHỆ VÀ PHẦN MỀM PHỔ TUỆ  
+**D-U-N-S Number:** 557339920  
+**Address:** 128 Binh My Street, Binh My Commune, Ho Chi Minh City
+
+**License:** Conditional non-commercial license. Commercial use, resale, SaaS/service use, redistribution, relicensing, marketplace publication, and business exploitation are prohibited without prior written permission. See `LICENSE.md`.
+
+**Trademark Notice:** WHMCS and related WHMCS names, marks, logos, and brand identifiers belong to their respective owner(s), including WHMCS Limited or applicable rights holder(s). This project is independent and is not affiliated with, endorsed by, sponsored by, certified by, or officially connected with WHMCS unless separately agreed in writing. All third-party trademarks belong to their respective owners.
+
+**Legal Documents:** See `NOTICE`, `LICENSE.md`, `COMMERCIAL-LICENSE.md`, `SUPPORT.md`, and `CODE_OF_CONDUCT.md`.
 
 ---
 
@@ -19,10 +29,10 @@ This is an independent agent system dedicated exclusively to WHMCS module develo
 .agents-whmcs/
 ├── CLAUDE.md                    ← Main technical reference
 ├── README.md                   ← This file
-├── devkits/                     ← Complete module templates (24)
-├── docs/                       ← Reference documentation (28)
-├── workflows/                  ← Step-by-step development guides (35)
-└── skills/                     ← Specialized development skills (107)
+├── devkits/                     ← Complete module templates (50)
+├── docs/                       ← Reference documentation (73)
+├── workflows/                  ← Step-by-step development guides (74)
+└── skills/                     ← Specialized development skills (148)
 ```
 
 ---
@@ -31,11 +41,11 @@ This is an independent agent system dedicated exclusively to WHMCS module develo
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| DevKits | 24 | Complete module templates |
-| Skills | 107 | Specialized development guides |
-| Workflows | 35 | Step-by-step processes |
-| Docs | 28 | Reference documentation |
-| **Total** | **194** | WHMCS development resources |
+| DevKits | 50 | Complete module templates |
+| Skills | 148 | Specialized development guides |
+| Workflows | 74 | Step-by-step processes |
+| Docs | 73 | Reference documentation |
+| **Total** | **345** | WHMCS development resources |
 
 ---
 
@@ -86,7 +96,7 @@ Skills provide deep-dive patterns, templates, and checklists for specific develo
 
 ---
 
-## Available DevKits (24)
+## Available DevKits (50)
 
 ### Core Modules
 1. **Provisioning Module** - Server/VPS/cloud provisioning
@@ -118,7 +128,7 @@ Skills provide deep-dive patterns, templates, and checklists for specific develo
 
 ---
 
-## Available Skills (107)
+## Available Skills (128)
 
 ### Core Development
 - `whmcs-core-reader` - WHMCS module patterns reading
@@ -211,4 +221,8 @@ Use these keywords when working with this agent:
 
 ## Contact
 
-**Owner:** Pho Tue SoftWare And Technology Solutions JSC (MST: 0318222203)
+**Legal Entity:** CÔNG TY CỔ PHẦN GIẢI PHÁP CÔNG NGHỆ VÀ PHẦN MỀM PHỔ TUỆ  
+**English Name:** Pho Tue SoftWare And Technology Solutions Joint Stock Company  
+**Tax Code:** 0318222903  
+**D-U-N-S Number:** 557339920  
+**Address:** 128 Binh My Street, Binh My Commune, Ho Chi Minh City

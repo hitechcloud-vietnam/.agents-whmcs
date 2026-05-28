@@ -1,6 +1,6 @@
 # CLAUDE.md — WHMCS Module Development Guide
 # Project: HiTechCloud DevKits — WHMCS Specialist
-# Owner: Pho Tue SoftWare And Technology Solutions JSC (MST: 0318222203)
+# Owner: Pho Tue SoftWare And Technology Solutions Joint Stock Company (Tax Code: 0318222903)
 # Version: 2.0 | Updated: 2026-05-28
 #
 # ── Role of this file ────────────────────────────────────────────────────────

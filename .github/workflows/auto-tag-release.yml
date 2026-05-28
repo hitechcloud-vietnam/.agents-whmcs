@@ -43,13 +43,17 @@ jobs:
           set -euo pipefail
 
           input_version="${{ github.event.inputs.version || '' }}"
+          latest_semver_tag="$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1 || true)"
+          previous_tag="${latest_semver_tag}"
+
           if [[ -n "${input_version}" ]]; then
             tag="${input_version}"
             [[ "${tag}" == v* ]] || tag="v${tag}"
           else
-            latest_tag="$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1 || true)"
+            latest_tag="${latest_semver_tag}"
             if [[ -z "${latest_tag}" ]]; then
               tag="v1.0.0"
+              previous_tag=""
             else
               version="${latest_tag#v}"
               IFS='.' read -r major minor patch <<< "${version}"
@@ -66,6 +70,7 @@ jobs:
             echo "skip=true" >> "${GITHUB_OUTPUT}"
           else
             echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
+            echo "previous_tag=${previous_tag}" >> "${GITHUB_OUTPUT}"
             echo "skip=false" >> "${GITHUB_OUTPUT}"
           fi
 
@@ -78,13 +83,64 @@ jobs:
           git tag -a "${tag}" -m "Release ${tag}" "${GITHUB_SHA}"
           git push origin "${tag}"
 
+      - name: Build release introduction from commit messages
+        id: release_body
+        if: steps.version.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tag="${{ steps.version.outputs.tag }}"
+          previous_tag="${{ steps.version.outputs.previous_tag }}"
+          body_file="${RUNNER_TEMP}/release-body.md"
+          short_sha="${GITHUB_SHA::7}"
+          head_subject="$(git log -1 --pretty=%s "${GITHUB_SHA}")"
+          head_body="$(git log -1 --pretty=%b "${GITHUB_SHA}")"
+
+          if [[ -n "${previous_tag}" ]] && git rev-parse "${previous_tag}" >/dev/null 2>&1; then
+            commit_range="${previous_tag}..${GITHUB_SHA}"
+            range_label="Từ \`${previous_tag}\` đến \`${short_sha}\`"
+          else
+            commit_range="${GITHUB_SHA}"
+            range_label="Toàn bộ lịch sử commit đến \`${short_sha}\`"
+          fi
+
+          {
+            echo "## Giới thiệu phát hành"
+            echo
+            echo "**${head_subject}**"
+            echo
+            echo "- Commit phát hành: \`${short_sha}\`"
+            echo "- Tag: \`${tag}\`"
+            echo
+            if [[ -n "${head_body}" ]]; then
+              echo "### Nội dung chi tiết từ commit mới nhất"
+              echo
+              echo "${head_body}"
+              echo
+            fi
+            echo "## Danh sách commit trong bản phát hành"
+            echo
+            echo "${range_label}"
+            echo
+            git log --reverse --pretty=format:'- `%h` %s' "${commit_range}"
+            echo
+            echo
+            echo "## Giấy phép và giới hạn sử dụng"
+            echo
+            echo "Bản phát hành này chịu sự điều chỉnh của \`LICENSE.md\`. Nghiêm cấm mọi hình thức sử dụng thương mại, kinh doanh, bán lại, cho thuê, cung cấp dịch vụ, tích hợp sản phẩm thương mại hoặc phân phối lại nếu chưa có văn bản cho phép riêng từ chủ sở hữu."
+          } > "${body_file}"
+
+          echo "body_path=${body_file}" >> "${GITHUB_OUTPUT}"
+
       - name: Create GitHub Release
         if: steps.version.outputs.skip != 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: Release ${{ steps.version.outputs.tag }}
-          generate_release_notes: true
+          body_path: ${{ steps.release_body.outputs.body_path }}
+          generate_release_notes: false
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
