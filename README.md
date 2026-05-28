@@ -29,9 +29,9 @@ This is an independent agent system dedicated exclusively to WHMCS module develo
 .agents-whmcs/
 ├── CLAUDE.md                    ← Main technical reference
 ├── README.md                   ← This file
-├── devkits/                     ← Complete module templates (50)
-├── docs/                       ← Reference documentation (73)
-├── workflows/                  ← Step-by-step development guides (74)
+├── devkits/                     ← Complete module templates (60)
+├── docs/                       ← Reference documentation (84)
+├── workflows/                  ← Step-by-step development guides (84)
 └── skills/                     ← Specialized development skills (148)
 ```
 
@@ -41,11 +41,11 @@ This is an independent agent system dedicated exclusively to WHMCS module develo
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| DevKits | 50 | Complete module templates |
+| DevKits | 60 | Complete module templates |
 | Skills | 148 | Specialized development guides |
-| Workflows | 74 | Step-by-step processes |
-| Docs | 73 | Reference documentation |
-| **Total** | **345** | WHMCS development resources |
+| Workflows | 84 | Step-by-step processes |
+| Docs | 84 | Reference documentation |
+| **Total** | **376** | WHMCS development resources |
 
 ---
 
@@ -96,7 +96,7 @@ Skills provide deep-dive patterns, templates, and checklists for specific develo
 
 ---
 
-## Available DevKits (50)
+## Available DevKits (70)
 
 ### Core Modules
 1. **Provisioning Module** - Server/VPS/cloud provisioning
@@ -125,6 +125,26 @@ Skills provide deep-dive patterns, templates, and checklists for specific develo
 22. **Support Module** - Helpdesk system
 23. **Reviews Module** - Product reviews
 24. **Backup Module** - Backup system
+25. **Subscription Management** - Subscription billing cycles
+26. **Customer Portal** - Custom client dashboard
+27. **Order Form Builder** - Customizable order forms
+28. **Product Configurator** - Product configuration wizard
+29. **Domain Checker** - Domain availability checker
+30. **Automation Cron** - Cron job automation
+31. **Webhook Handler** - Webhook integration
+32. **Two-Factor Auth** - Two-factor authentication
+33. **IP Whitelist** - Admin IP whitelist
+34. **Rate Limiter** - API rate limiting
+35. **Email Automation** - Email automation sequences
+36. **Ticket Automation** - Support ticket automation
+37. **Client Migration** - Client data migration
+38. **Invoice Reminder** - Invoice reminder scheduler
+39. **Service Upgrade** - Service upgrade/downgrade
+40. **Usage Billing** - Usage-based billing tracker
+41. **Multi-Tenant** - Multi-tenant architecture
+42. **Affiliate Tracking** - Advanced affiliate tracking
+43. **Marketplace** - Digital marketplace
+44. **API Key Manager** - API key management
 
 ---
 

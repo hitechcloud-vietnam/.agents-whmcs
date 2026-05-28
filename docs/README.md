@@ -53,22 +53,33 @@ A comprehensive collection of guides and references for WHMCS module and add-on 
 ### Localization
 - [Module Localization Guide](module-localization-guide.md) - Multi-language support
 
-### Design Patterns (15 documents)
+### Design Patterns (35 documents)
 - [Adapter Pattern](adapter-pattern.md) - External API integration
 - [Builder Pattern](builder-pattern.md) - Complex object construction
 - [Chain of Responsibility](chain-of-responsibility.md) - Request processing
+- [Command Pattern](command-pattern.md) - Command pattern implementation
 - [Composite Pattern](composite-pattern.md) - Tree structures
+- [CQRS Pattern](cqrs-pattern.md) - CQRS pattern basics
 - [Decorator Pattern](decorator-pattern.md) - Runtime extensions
+- [Dependency Injection](dependency-injection.md) - DI patterns in WHMCS
+- [DTO Pattern](dto-pattern.md) - Data transfer objects
+- [Event Sourcing](event-sourcing.md) - Event-driven architecture
 - [Facade Pattern](facade-pattern.md) - Simplified interfaces
 - [Factory Pattern](factory-pattern.md) - Object creation
 - [Flyweight Pattern](flyweight-pattern.md) - Memory optimization
+- [Hexagonal Architecture](hexagonal-architecture.md) - Hexagonal architecture intro
 - [Interpreter Pattern](interpreter-pattern.md) - DSL implementations
 - [Memento Pattern](memento-pattern.md) - State snapshots
 - [Middleware Patterns](middleware-patterns.md) - Request processing
+- [Observer Pattern](observer-pattern.md) - Observer pattern for hooks
 - [Proxy Pattern](proxy-pattern.md) - Lazy loading
+- [Repository Pattern](repository-pattern.md) - Repository pattern for data access
+- [Service Layer](service-layer.md) - Service layer architecture
+- [SOLID Principles](solid-principles.md) - SOLID principles in module dev
 - [State Pattern](state-pattern.md) - State machines
 - [Strategy Pattern](strategy-pattern.md) - Algorithm selection
 - [Template Method](template-method.md) - Algorithm skeleton
+- [Value Objects](value-objects.md) - Value objects in PHP
 
 ### Theming & UI
 - [Client Area Theming](client-area-theming.md) - Front-end customization
@@ -106,7 +117,7 @@ A comprehensive collection of guides and references for WHMCS module and add-on 
 
 ---
 
-**Total: 61 documentation files**
+**Total: 81 documentation files**
 
 ## Quick Links
 
