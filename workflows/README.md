@@ -1,6 +1,6 @@
 # WHMCS Workflows
 
-This directory contains 71 workflow guides for WHMCS development, deployment, and operations.
+This directory contains 81 workflow guides for WHMCS development, deployment, and operations.
 
 ## Workflow Categories
 
@@ -21,7 +21,7 @@ This directory contains 71 workflow guides for WHMCS development, deployment, an
 - [Webhook Automation Workflow](whmcs-webhook-automation-workflow.md)
 - [Customer Portal Workflow](whmcs-customer-portal-workflow.md)
 
-### Deployment & Infrastructure (25 workflows)
+### Deployment & Infrastructure (30 workflows)
 - [Docker Deployment](whmcs-docker-deployment.md)
 - [Deployment Best Practices](whmcs-deployment-best-practices.md)
 - [Deployment Pipeline](whmcs-deployment-pipeline.md)
@@ -47,8 +47,13 @@ This directory contains 71 workflow guides for WHMCS development, deployment, an
 - [Change Management](whmcs-change-management.md)
 - [Audit Trail](whmcs-audit-trail.md)
 - [Compliance Reporting](whmcs-compliance-reporting.md)
+- [Scaling Guide](whmcs-scaling-guide.md)
+- [Load Testing](whmcs-load-testing.md)
+- [Cache Optimization](whmcs-cache-optimization.md)
+- [Database Tuning](whmcs-database-tuning.md)
+- [Search Optimization](whmcs-search-optimization.md)
 
-### Business Operations (8 workflows)
+### Business Operations (15 workflows)
 - [Provisioning Automation](whmcs-provisioning-automation.md)
 - [Invoice Customization](whmcs-invoice-customization.md)
 - [Invoice Automation](whmcs-invoice-automation-workflow.md)
@@ -59,6 +64,11 @@ This directory contains 71 workflow guides for WHMCS development, deployment, an
 - [Bulk Operations Workflow](whmcs-bulk-operations-workflow.md)
 - [Vendor Management](whmcs-vendor-management.md)
 - [Continuous Improvement](whmcs-continuous-improvement.md)
+- [API Versioning](whmcs-api-versioning.md)
+- [Client Segmentation](whmcs-client-segmentation.md)
+- [Revenue Optimization](whmcs-revenue-optimization.md)
+- [Churn Reduction](whmcs-churn-reduction.md)
+- [Customer Retention](whmcs-customer-retention.md)
 
 ### Security & Compliance (10 workflows)
 - [Security Audit](whmcs-security-audit.md)
@@ -77,10 +87,10 @@ This directory contains 71 workflow guides for WHMCS development, deployment, an
 | Category | Count |
 |----------|-------|
 | Development & Testing | 15 |
-| Deployment & Infrastructure | 37 |
-| Business Operations | 11 |
-| Security & Compliance | 8 |
-| **Total** | **71** |
+| Deployment & Infrastructure | 30 |
+| Business Operations | 15 |
+| Security & Compliance | 10 |
+| **Total** | **81** |
 
 ## Usage
 
