@@ -30,7 +30,7 @@ This is an independent agent system dedicated exclusively to WHMCS module develo
 ├── CLAUDE.md                    ← Main technical reference
 ├── README.md                   ← This file
 ├── devkits/                     ← Complete module templates (99)
-├── docs/                       ← Reference documentation (107)
+├── docs/                       ← Reference documentation (117)
 ├── workflows/                  ← Step-by-step development guides (113)
 └── skills/                     ← Specialized development skills (168)
 ```
@@ -44,8 +44,8 @@ This is an independent agent system dedicated exclusively to WHMCS module develo
 | DevKits | 99 | Complete module templates |
 | Skills | 168 | Specialized development guides |
 | Workflows | 113 | Step-by-step processes |
-| Docs | 107 | Reference documentation |
-| **Total** | **487** | WHMCS development resources |
+| Docs | 117 | Reference documentation |
+| **Total** | **497** | WHMCS development resources |
 
 ---
 
