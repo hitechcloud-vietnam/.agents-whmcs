@@ -3,7 +3,7 @@
 **Purpose:** Autonomous agent configuration for WHMCS module development.
 
 **Owner:** Pho Tue SoftWare And Technology Solutions Joint Stock Company (Tax Code: 0318222903)
-**Version:** 2.0 | **Updated:** 2026-05-29
+**Version:** 3.0 | **Updated:** 2026-05-30
 
 **Legal Entity:** CÔNG TY CỔ PHẦN GIẢI PHÁP CÔNG NGHỆ VÀ PHẦN MỀM PHỔ TUỆ  
 **D-U-N-S Number:** 557339920  
@@ -33,10 +33,10 @@ This is an independent agent system dedicated exclusively to WHMCS module develo
 ├── COMMERCIAL-LICENSE.md       ← Commercial usage terms
 ├── SUPPORT.md                  ← Support information
 ├── CODE_OF_CONDUCT.md         ← Code of conduct
-├── devkits/                    ← Complete module templates (450+)
-├── docs/                       ← Reference documentation (500+)
-├── workflows/                  ← Step-by-step development guides (694+)
-└── skills/                     ← Specialized development skills (485+)
+├── devkits/                    ← Complete module templates (500+)
+├── docs/                       ← Reference documentation (540+)
+├── workflows/                  ← Step-by-step development guides (950+)
+└── skills/                     ← Specialized development skills (530+)
 ```
 
 ---
@@ -45,11 +45,11 @@ This is an independent agent system dedicated exclusively to WHMCS module develo
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| DevKits | 450+ | Complete module templates |
-| Skills | 485+ | Specialized development guides |
-| Workflows | 694+ | Step-by-step processes |
-| Docs | 500+ | Reference documentation |
-| **Total** | **2130+** | WHMCS development resources |
+| DevKits | 500+ | Complete module templates |
+| Skills | 530+ | Specialized development guides |
+| Workflows | 950+ | Step-by-step processes |
+| Docs | 540+ | Reference documentation |
+| **Total** | **2520+** | WHMCS development resources |
 
 ---
 
