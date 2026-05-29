@@ -3,7 +3,7 @@
 **Purpose:** Autonomous agent configuration for WHMCS module development.
 
 **Owner:** Pho Tue SoftWare And Technology Solutions Joint Stock Company (Tax Code: 0318222903)
-**Version:** 1.0 | **Updated:** 2026-05-28
+**Version:** 2.0 | **Updated:** 2026-05-29
 
 **Legal Entity:** CÔNG TY CỔ PHẦN GIẢI PHÁP CÔNG NGHỆ VÀ PHẦN MỀM PHỔ TUỆ  
 **D-U-N-S Number:** 557339920  
@@ -28,11 +28,15 @@ This is an independent agent system dedicated exclusively to WHMCS module develo
 ```
 .agents-whmcs/
 ├── CLAUDE.md                    ← Main technical reference
-├── README.md                   ← This file
-├── devkits/                     ← Complete module templates (99)
-├── docs/                       ← Reference documentation (117)
-├── workflows/                  ← Step-by-step development guides (113)
-└── skills/                     ← Specialized development skills (168)
+├── NOTICE                      ← Legal notices
+├── LICENSE.md                  ← License terms
+├── COMMERCIAL-LICENSE.md       ← Commercial usage terms
+├── SUPPORT.md                  ← Support information
+├── CODE_OF_CONDUCT.md         ← Code of conduct
+├── devkits/                    ← Complete module templates (450+)
+├── docs/                       ← Reference documentation (500+)
+├── workflows/                  ← Step-by-step development guides (694+)
+└── skills/                     ← Specialized development skills (485+)
 ```
 
 ---
@@ -41,11 +45,11 @@ This is an independent agent system dedicated exclusively to WHMCS module develo
 
 | Category | Count | Description |
 |----------|-------|-------------|
-| DevKits | 99 | Complete module templates |
-| Skills | 168 | Specialized development guides |
-| Workflows | 113 | Step-by-step processes |
-| Docs | 117 | Reference documentation |
-| **Total** | **497** | WHMCS development resources |
+| DevKits | 450+ | Complete module templates |
+| Skills | 485+ | Specialized development guides |
+| Workflows | 694+ | Step-by-step processes |
+| Docs | 500+ | Reference documentation |
+| **Total** | **2130+** | WHMCS development resources |
 
 ---
 

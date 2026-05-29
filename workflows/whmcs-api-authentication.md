@@ -1,3 +1,223 @@
+# WHMCS API Authentication Workflow
+
+## Purpose
+Guide developers through setting up and configuring WHMCS API authentication.
+
+## Prerequisites
+- WHMCS installation (v7.0+)
+- Admin access
+- API credentials
+- PHP/cURL knowledge
+
+## Steps
+
+### Phase 1: API Authentication Overview
+
+1. Authentication methods
+   ```
+   WHMCS API Authentication:
+   ├── API Credentials (Username + Password Hash)
+   ├── API Keys (Access Key)
+   ├── OAuth 2.0 (Modern)
+   └── Two-Factor Authentication
+   ```
+
+2. API access requirements
+   ```
+   Required for API access:
+   - Admin username with API access
+   - API key or password hash
+   - WHMCS IP access restrictions (optional)
+   - HTTPS for security
+   ```
+
+### Phase 2: Enabling API Access
+
+1. Admin configuration
+   - Navigate to: WHMCS Admin > Configuration > System Settings > API Credentials
+   - Or: WHMCS Admin > Configuration > APIs
+
+2. Create API credentials
+   ```
+   Steps:
+   1. Go to Setup > Staff Management > API Credentials
+   2. Click "Create New Credentials"
+   3. Enter description/label
+   4. Select permissions
+   5. Generate credentials
+   6. Save API Key and Secret securely
+   ```
+
+3. API credentials structure
+   ```php
+   // API Access Configuration
+   $whmcsApi = [
+       'url' => 'https://your-whmcs-domain.com/includes/api.php',
+       'username' => 'admin_user',
+       'password' => 'api_access_key',
+       'access_key' => 'optional_access_key_for_webhooks'
+   ];
+   ```
+
+### Phase 3: Basic Authentication Setup
+
+1. Username + Password Hash method
+   ```php
+   <?php
+   class WHMCSApiAuth {
+       private $apiUrl;
+       private $username;
+       private $password;
+       
+       public function __construct($apiUrl, $username, $password) {
+           $this->apiUrl = $apiUrl;
+           $this->username = $username;
+           $this->password = $password;
+       }
+       
+       public function call($action, $params = []) {
+           $postData = array_merge([
+               'username' => $this->username,
+               'password' => $this->password,
+               'action' => $action,
+               'responsetype' => 'json'
+           ], $params);
+           
+           return $this->executeRequest($postData);
+       }
+       
+       private function executeRequest($data) {
+           $ch = curl_init();
+           curl_setopt($ch, CURLOPT_URL, $this->apiUrl);
+           curl_setopt($ch, CURLOPT_POST, 1);
+           curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+           curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+           curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+           curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+           
+           $response = curl_exec($ch);
+           $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+           curl_close($ch);
+           
+           return json_decode($response, true);
+       }
+   }
+   ```
+
+2. Access Key method
+   ```php
+   class WHMCSApiAuthKey {
+       private $apiUrl;
+       private $accessKey;
+       
+       public function __construct($apiUrl, $accessKey) {
+           $this->apiUrl = $apiUrl;
+           $this->accessKey = $accessKey;
+       }
+       
+       public function call($action, $params = []) {
+           $postData = array_merge([
+               'action' => $action,
+               'access_key' => $this->accessKey,
+               'responsetype' => 'json'
+           ], $params);
+           
+           return $this->executeRequest($postData);
+       }
+   }
+   ```
+
+### Phase 4: Two-Factor Authentication
+
+1. API with 2FA
+   ```php
+   $postData = [
+       'username' => 'admin_user',
+       'password' => 'password_hash',
+       'action' => 'AddOrder',
+       'responsetype' => 'json',
+   ];
+   ```
+
+2. Create API-specific credentials without 2FA
+   ```
+   Best Practice:
+   - Create dedicated API users
+   - Enable 2FA for admin accounts
+   - Use API keys for integrations
+   - Rotate keys regularly
+   ```
+
+### Phase 5: IP Access Control
+
+1. Configure IP restrictions
+   ```
+   WHMCS Admin > Configuration > System Settings > API Credentials
+   > IP Access Control
+   
+   Options:
+   - Allow specific IPs
+   - Allow IP ranges
+   - Whitelist/Denylist
+   ```
+
+### Phase 6: Secure Connection Setup
+
+1. HTTPS requirement
+   ```php
+   if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+       die('HTTPS required for API access');
+   }
+   ```
+
+2. SSL configuration
+   ```php
+   $options = [
+       CURLOPT_SSL_VERIFYPEER => true,
+       CURLOPT_SSL_VERIFYHOST => 2,
+   ];
+   ```
+
+### Phase 7: Error Handling
+
+1. Authentication errors
+   ```php
+   $result = $api->call('GetClientsDetails', ['clientid' => 1]);
+   
+   if (isset($result['result']) && $result['result'] === 'error') {
+       switch ($result['message']) {
+           case 'Access Denied':
+               break;
+           case 'Invalid API Key':
+               break;
+           case 'IP Not Allowed':
+               break;
+       }
+   }
+   ```
+
+## Security Best Practices
+
+1. Credentials management
+   - Never commit credentials to git
+   - Use environment variables
+   - Rotate keys regularly
+   - Limit API user permissions
+
+2. Access control
+   - Enable IP restrictions
+   - Use HTTPS only
+   - Monitor API usage logs
+   - Set up rate limiting
+
+## Related Workflows
+- whmcs-api-key-generation
+- whmcs-api-integration
+- whmcs-api-rate-limiting
+- whmcs-api-testing
+
+---
+
 # WHMCS API Authentication Patterns
 
 ## Purpose

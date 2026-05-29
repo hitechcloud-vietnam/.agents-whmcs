@@ -1,694 +1,422 @@
-# WHMCS Service Lifecycle Hooks
-
-**Version:** 8.x | **Updated:** 2026-05-29
-**Related Skills:** `whmcs-hooks-development`, `whmcs-lifecycle-management`, `whmcs-service-billing`
-
----
+# WHMCS Service Hooks
 
 ## Overview
 
-Service lifecycle hooks allow you to automate actions during the lifecycle of hosting services. This includes provisioning, suspension, termination, upgrades, and custom service-related events.
+Service hooks allow you to execute custom code during hosting service lifecycle events including creation, suspension, termination, and updates.
 
----
+## Available Service Hooks
 
-## Service Hooks Overview
-
-### Available Service Hooks
-
-| Hook Name | Description | Parameters |
-|-----------|-------------|------------|
-| `AfterModuleCreate` | Service provisioned | `serviceid`, `userid` |
-| `AfterModuleSuspend` | Service suspended | `serviceid`, `userid` |
-| `AfterModuleUnsuspend` | Service reactivated | `serviceid`, `userid` |
-| `AfterModuleTerminate` | Service terminated | `serviceid`, `userid` |
-| `AfterModuleChangePackage` | Package upgraded/downgraded | `serviceid`, `params` |
-| `AfterModuleChangePassword` | Password changed | `serviceid`, `newpassword` |
-| `PreServiceDelete` | Before termination | `userid`, `serviceid` |
-| `ServiceEdit` | Service details edited | `serviceid`, `params` |
-| `ServiceView` | Service details viewed | `serviceid` |
-
----
-
-## Provisioning Hooks
-
-### After Service Creation
+### Service Created Hook
 
 ```php
 <?php
-/**
- * AfterModuleCreate hook
- * Execute after successful service provisioning
- */
-
-add_hook('AfterModuleCreate', 1, function($vars) {
-    $serviceId = $vars['serviceid'];
-    $userId = $vars['userid'];
-
-    // Get service details
-    $service = Capsule::table('tblhosting')
-        ->where('id', $serviceId)
-        ->first();
-
-    $client = Capsule::table('tblclients')
-        ->where('id', $userId)
-        ->first();
-
-    // Example 1: Send welcome email with server details
-    send_email([
-        'type' => 'product',
-        'id' => $service->packageid,
-        'customvars' => [
-            'service_id' => $serviceId,
-            'server_ip' => $service->dedicatedip,
-            'server_username' => $service->username,
-            'control_panel_url' => getControlPanelUrl($service),
-        ],
-    ], $userId);
-
-    // Example 2: Create DNS records
-    $product = Capsule::table('tblproducts')
-        ->where('id', $service->packageid)
-        ->first();
-
-    if ($product->autosetup == 'on') {
-        createDnsRecords($service->domain, $service->dedicatedip);
-    }
-
-    // Example 3: Sync to external CRM
-    $crmData = [
-        'service_id' => $serviceId,
-        'client_email' => $client->email,
-        'product_name' => $product->name,
-        'status' => 'active',
-        'next_due' => $service->nextduedate,
-    ];
-    syncToCrm($crmData);
-
-    // Example 4: Create billing record
-    Capsule::table('mod_service_provisioning_log')->insert([
-        'service_id' => $serviceId,
-        'action' => 'create',
-        'timestamp' => date('Y-m-d H:i:s'),
-        'details' => json_encode([
-            'server_ip' => $service->dedicatedip,
-            'username' => $service->username,
-        ]),
-    ]);
-});
-
-/**
- * Get control panel URL based on product type
- */
-function getControlPanelUrl($service): string
-{
-    $product = Capsule::table('tblproducts')
-        ->where('id', $service->packageid)
-        ->first();
-
-    $server = Capsule::table('tblservers')
-        ->where('id', $service->server)
-        ->first();
-
-    return sprintf(
-        'https://%s:%s@%s:%d',
-        $server->username,
-        $server->password,
-        $server->hostname,
-        $server->secureport ?: 2087
-    );
-}
-```
-
-### Pre-Provisioning Validation
-
-```php
-<?php
-/**
- * Custom pre-provisioning checks
- */
-
-add_hook('OrderProductValidation', 1, function($vars) {
+// Triggered when a new service/hosting account is created
+add_hook('ServiceCreated', 1, function(array $vars) {
+    $serviceId = $vars['service_id'];
+    $userId = $vars['user_id'];
     $productId = $vars['pid'];
-    $userId = $_SESSION['uid'];
-
-    // Check for existing similar services
-    $existingService = Capsule::table('tblhosting')
-        ->where('userid', $userId)
-        ->where('domainstatus', 'Active')
-        ->where('packageid', $productId)
-        ->first();
-
-    if ($existingService) {
-        return [
-            'error' => 'You already have an active service with this product.',
-            'existing_service_id' => $existingService->id,
-        ];
-    }
-
-    // Check resource limits
-    $clientServices = Capsule::table('tblhosting')
-        ->where('userid', $userId)
-        ->where('domainstatus', 'Active')
-        ->count();
-
-    $maxServices = Capsule::table('tblclients')
-        ->where('id', $userId)
-        ->value('max_services');
-
-    if ($maxServices && $clientServices >= $maxServices) {
-        return [
-            'error' => 'You have reached your maximum number of services.',
-            'upgrade_url' => 'upgrade.php',
-        ];
-    }
-
-    return $vars;
-});
-```
-
----
-
-## Suspension Hooks
-
-### After Service Suspension
-
-```php
-<?php
-/**
- * AfterModuleSuspend hook
- * Execute after service suspension
- */
-
-add_hook('AfterModuleSuspend', 1, function($vars) {
-    $serviceId = $vars['serviceid'];
-    $userId = $vars['userid'];
-
-    // Get service details
-    $service = Capsule::table('tblhosting')
-        ->where('id', $serviceId)
-        ->first();
-
-    $client = Capsule::table('tblclients')
-        ->where('id', $userId)
-        ->first();
-
-    // Example 1: Update DNS to suspended landing page
-    updateDnsSuspendedPage($service->domain);
-
-    // Example 2: Notify client
-    send_email([
-        'type' => 'product',
-        'id' => $service->packageid,
-        'customvars' => [
-            'service_id' => $serviceId,
-            'suspension_reason' => getSuspensionReason($serviceId),
-            'reactivate_url' => getReactivateUrl($serviceId),
-        ],
-    ], $userId);
-
-    // Example 3: Update external systems
-    updateExternalService($serviceId, 'suspended');
-
-    // Example 4: Log suspension
-    Capsule::table('mod_service_audit')->insert([
-        'service_id' => $serviceId,
-        'action' => 'suspend',
-        'performed_by' => $_SESSION['adminid'] ?? 'system',
-        'timestamp' => date('Y-m-d H:i:s'),
-        'reason' => getSuspensionReason($serviceId),
-    ]);
-
-    // Example 5: Release resources (if applicable)
-    releaseLoadBalancerNode($serviceId);
-    freeBackupSlots($serviceId);
+    $domain = $vars['domain'];
+    
+    // Initialize service configuration
+    initializeServiceConfig($serviceId);
+    
+    // Setup monitoring
+    setupServiceMonitoring($serviceId, $domain);
+    
+    // Configure backups
+    configureServiceBackups($serviceId, $productId);
+    
+    // Set up SSL if applicable
+    setupInitialSSL($serviceId, $domain);
+    
+    // Configure DNS
+    configureServiceDNS($serviceId, $domain);
+    
+    return ['success' => true, 'service_id' => $serviceId];
 });
 
-/**
- * Get suspension reason from WHMCS
- */
-function getSuspensionReason(int $serviceId): string
+function setupServiceMonitoring(int $serviceId, string $domain): void
 {
-    $log = Capsule::table('tblactivitylog')
-        ->where('description', 'like', '%Suspend%')
-        ->where('description', 'like', '%' . $serviceId . '%')
-        ->orderBy('id', 'desc')
-        ->first();
-
-    if ($log) {
-        return $log->description;
-    }
-
-    return 'Service suspended due to non-payment';
+    Capsule::table('mod_service_monitoring')->insert([
+        'service_id' => $serviceId,
+        'domain' => $domain,
+        'check_interval' => 60,
+        'last_check' => null,
+        'status' => 'active',
+        'created_at' => date('Y-m-d H:i:s'),
+    ]);
 }
 ```
 
-### Pre-Suspension Hooks
+### Service Updated Hook
 
 ```php
 <?php
-/**
- * Custom pre-suspension validation
- */
-
-add_hook('PreServiceSuspend', 1, function($vars) {
-    $serviceId = $vars['serviceid'];
-
-    // Check for pending orders
-    $pendingOrders = Capsule::table('tblorders')
-        ->where('userid', $vars['userid'])
-        ->whereIn('status', ['Pending', 'Active'])
-        ->where('id', '!=', $serviceId)
-        ->count();
-
-    if ($pendingOrders > 0) {
-        return [
-            'error' => 'Cannot suspend: Customer has pending orders.',
-        ];
+// Triggered when service details are updated
+add_hook('ServiceUpdated', 1, function(array $vars) {
+    $serviceId = $vars['service_id'];
+    $changes = $vars['changes'] ?? [];
+    
+    // Log changes for audit
+    logServiceChanges($serviceId, $changes);
+    
+    // Update server configuration
+    if (isset($changes['bwlimit'])) {
+        updateBandwidthLimit($serviceId, $changes['bwlimit']);
     }
-
-    // Check for active SLA
-    $hasSla = Capsule::table('mod_service_sla')
-        ->where('service_id', $serviceId)
-        ->where('status', 'active')
-        ->where('immunity_until', '>', date('Y-m-d H:i:s'))
-        ->exists();
-
-    if ($hasSla) {
-        return [
-            'error' => 'Cannot suspend: Service has active SLA immunity.',
-            'immunity_expires' => getSlaImmunityExpiry($serviceId),
-        ];
+    
+    // Update resource allocation
+    if (isset($changes['disklimit'])) {
+        updateDiskLimit($serviceId, $changes['disklimit']);
     }
+    
+    // Update custom fields on server
+    syncCustomFieldsToServer($serviceId, $changes);
+    
+    return ['success' => true];
+});
 
-    return $vars;
+function logServiceChanges(int $serviceId, array $changes): void
+{
+    Capsule::table('mod_service_change_log')->insert([
+        'service_id' => $serviceId,
+        'changes' => json_encode($changes),
+        'changed_by' => $_SESSION['adminid'] ?? 0,
+        'ip_address' => $_SERVER['REMOTE_ADDR'] ?? '',
+        'created_at' => date('Y-m-d H:i:s'),
+    ]);
+}
+```
+
+### Service Suspended Hook
+
+```php
+<?php
+// Triggered when a service is suspended
+add_hook('ServiceSuspended', 1, function(array $vars) {
+    $serviceId = $vars['service_id'];
+    $suspendReason = $vars['suspend_reason'] ?? 'Payment overdue';
+    
+    // Log suspension
+    logServiceSuspension($serviceId, $suspendReason);
+    
+    // Disable monitoring alerts
+    disableServiceMonitoring($serviceId);
+    
+    // Update DNS to suspended page
+    redirectToSuspendedPage($serviceId);
+    
+    // Send suspension notification
+    sendSuspensionNotification($serviceId, $suspendReason);
+    
+    // Schedule automatic unsuspend check
+    scheduleUnsuspendCheck($serviceId);
+    
+    return ['success' => true];
+});
+
+function logServiceSuspension(int $serviceId, string $reason): void
+{
+    Capsule::table('mod_service_audit')->insert([
+        'service_id' => $serviceId,
+        'action' => 'suspended',
+        'reason' => $reason,
+        'suspended_at' => date('Y-m-d H:i:s'),
+    ]);
+}
+```
+
+### Service Unsuspended Hook
+
+```php
+<?php
+// Triggered when a service is unsuspended
+add_hook('ServiceUnsuspended', 1, function(array $vars) {
+    $serviceId = $vars['service_id'];
+    
+    // Re-enable monitoring
+    enableServiceMonitoring($serviceId);
+    
+    // Restore DNS configuration
+    restoreDNSConfiguration($serviceId);
+    
+    // Resume automated tasks
+    resumeServiceTasks($serviceId);
+    
+    // Send unsuspension notification
+    sendUnsuspensionNotification($serviceId);
+    
+    // Record unsuspension for billing
+    recordUnsuspension($serviceId);
+    
+    return ['success' => true];
 });
 ```
 
----
-
-## Termination Hooks
-
-### Before Service Deletion
+### Service Terminated Hook
 
 ```php
 <?php
-/**
- * PreServiceDelete hook
- * Execute before service termination
- */
-
-add_hook('PreServiceDelete', 1, function($vars) {
-    $serviceId = $vars['serviceid'];
-
-    // Example 1: Create final backup
-    createServiceBackup($serviceId, 'final');
-
-    // Example 2: Export service data
-    $exportPath = exportServiceData($serviceId);
-    saveBackupLocation($serviceId, $exportPath);
-
-    // Example 3: Send final data export email
-    $service = Capsule::table('tblhosting')
-        ->where('id', $serviceId)
-        ->first();
-
-    send_email([
-        'type' => 'product',
-        'id' => $service->packageid,
-        'customvars' => [
-            'data_export_url' => $exportPath,
-            'export_expires' => date('Y-m-d H:i:s', strtotime('+7 days')),
-        ],
-    ], $vars['userid']);
-
-    // Example 4: Cancel scheduled tasks
-    cancelScheduledTasks($serviceId);
-
-    // Example 5: Release domain (if applicable)
-    if ($service->domain) {
-        markDomainForDeletion($service->domain);
-    }
-
-    return $vars; // Return to continue with termination
-});
-
-/**
- * Allow force termination (skip confirmation)
- */
-add_hook('PreServiceDelete', 1, function($vars) {
-    // Check if admin is forcing termination
-    if ($_SESSION['adminid'] && $_GET['force'] === '1') {
-        $admin = Capsule::table('tbladmins')
-            ->where('id', $_SESSION['adminid'])
-            ->first();
-
-        if ($admin->roleid == 1) { // Full admin
-            return [
-                'skip_confirmation' => true,
-            ];
-        }
-    }
-
-    return $vars;
-});
-```
-
-### After Termination
-
-```php
-<?php
-/**
- * AfterModuleTerminate hook
- * Execute after service termination
- */
-
-add_hook('AfterModuleTerminate', 1, function($vars) {
-    $serviceId = $vars['serviceid'];
-
-    // Example 1: Update external systems
-    updateExternalService($serviceId, 'terminated');
-
-    // Example 2: Archive service data
+// Triggered when a service is terminated
+add_hook('ServiceTerminated', 1, function(array $vars) {
+    $serviceId = $vars['service_id'];
+    $terminateReason = $vars['terminate_reason'] ?? 'Manual termination';
+    
+    // Backup data before termination
+    $backupResult = createTerminationBackup($serviceId);
+    
+    // Send termination notice
+    sendTerminationNotification($serviceId, $terminateReason);
+    
+    // Archive service data
     archiveServiceData($serviceId);
-
-    // Example 3: Release SSL certificates
-    revokeSslCertificates($serviceId);
-
-    // Example 4: Update monitoring systems
-    removeFromMonitoring($serviceId);
-
-    // Example 5: Log termination
-    Capsule::table('mod_service_audit')->insert([
-        'service_id' => $serviceId,
-        'action' => 'terminate',
-        'performed_by' => $_SESSION['adminid'] ?? 'system',
-        'timestamp' => date('Y-m-d H:i:s'),
-        'data' => json_encode($_POST),
-    ]);
-
-    // Example 6: Remove DNS records (after grace period)
-    scheduleDnsCleanup($serviceId, '+7 days');
-});
-```
-
----
-
-## Upgrade/Downgrade Hooks
-
-### After Package Change
-
-```php
-<?php
-/**
- * AfterModuleChangePackage hook
- * Execute after service upgrade/downgrade
- */
-
-add_hook('AfterModuleChangePackage', 1, function($vars) {
-    $serviceId = $vars['serviceid'];
-    $params = $vars['params'];
-
-    // Get updated service
-    $service = Capsule::table('tblhosting')
-        ->where('id', $serviceId)
-        ->first();
-
-    $newProduct = Capsule::table('tblproducts')
-        ->where('id', $service->packageid)
-        ->first();
-
-    // Example 1: Apply new resource limits
-    applyNewResourceLimits($serviceId, $newProduct);
-
-    // Example 2: Resize server resources
-    resizeServerResources($serviceId, [
-        'cpu' => $newProduct->configoption1,
-        'ram' => $newProduct->configoption2,
-        'disk' => $newProduct->configoption3,
-    ]);
-
-    // Example 3: Send upgrade confirmation
-    send_email([
-        'type' => 'product',
-        'id' => $service->packageid,
-        'customvars' => [
-            'new_plan' => $newProduct->name,
-            'new_price' => $service->amount,
-        ],
-    ], $service->userid);
-
-    // Example 4: Update billing (prorate)
-    calculateProration($serviceId, $params);
-
-    // Example 5: Log the change
-    Capsule::table('mod_service_changes')->insert([
-        'service_id' => $serviceId,
-        'change_type' => 'package_change',
-        'old_product_id' => $params['old_pid'],
-        'new_product_id' => $params['new_pid'],
-        'timestamp' => date('Y-m-d H:i:s'),
-        'admin_id' => $_SESSION['adminid'] ?? null,
-    ]);
-});
-
-/**
- * Prorate billing calculation
- */
-function calculateProration(int $serviceId, array $params): void
-{
-    $service = Capsule::table('tblhosting')->where('id', $serviceId)->first();
-
-    $oldPrice = $params['old_recurring'] ?? 0;
-    $newPrice = $service->amount;
-    $billingCycle = $params['billing_cycle'] ?? 'monthly';
-
-    // Calculate prorated amounts
-    $daysInCycle = 30; // Simplified
-    $daysRemaining = daysRemainingInCycle($serviceId);
-
-    $oldProrate = ($oldPrice / $daysInCycle) * $daysRemaining;
-    $newProrate = ($newPrice / $daysInCycle) * $daysRemaining;
-
-    $difference = $newProrate - $oldProrate;
-
-    if ($difference != 0) {
-        // Apply credit or charge
-        if ($difference > 0) {
-            addInvoiceItem($serviceId, 'Upgrade Proration', $difference);
-        } else {
-            addCredit($service->userid, abs($difference), 'Downgrade credit');
-        }
-    }
-}
-```
-
----
-
-## Password Change Hooks
-
-### After Password Change
-
-```php
-<?php
-/**
- * AfterModuleChangePassword hook
- * Execute after service password change
- */
-
-add_hook('AfterModuleChangePassword', 1, function($vars) {
-    $serviceId = $vars['serviceid'];
-    $newPassword = $vars['newpassword'];
-
-    // Example 1: Log password change (without password)
-    Capsule::table('mod_service_audit')->insert([
-        'service_id' => $serviceId,
-        'action' => 'password_change',
-        'timestamp' => date('Y-m-d H:i:s'),
-        'admin_id' => $_SESSION['adminid'] ?? null,
-        'ip_address' => $_SERVER['REMOTE_ADDR'],
-    ]);
-
-    // Example 2: Update external systems
-    updateRemotePassword($serviceId, $newPassword);
-
-    // Example 3: Update control panel
-    updateControlPanelPassword($serviceId, $newPassword);
-
-    // Example 4: Notify client
-    $service = Capsule::table('tblhosting')->where('id', $serviceId)->first();
-    send_email([
-        'type' => 'product',
-        'id' => $service->packageid,
-        'customvars' => [
-            'service_domain' => $service->domain,
-        ],
-    ], $service->userid);
-
-    // Example 5: Security alert for admin changes
-    if ($_SESSION['adminid']) {
-        $admin = Capsule::table('tbladmins')
-            ->where('id', $_SESSION['adminid'])
-            ->first();
-
-        logActivity("Admin {$admin->username} changed password for service #{$serviceId}");
-    }
-});
-```
-
----
-
-## Service View Hooks
-
-### Custom Service Page Data
-
-```php
-<?php
-/**
- * ServiceView hook
- * Add data to service details page
- */
-
-add_hook('ServiceView', 1, function($vars) {
-    $serviceId = $vars['serviceid'];
-
-    // Example 1: Get server status
-    $serverStatus = getServerStatus($serviceId);
-
-    // Example 2: Get usage metrics
-    $usage = getServiceUsage($serviceId);
-
-    // Example 3: Get recent activity
-    $activity = getRecentServiceActivity($serviceId);
-
+    
+    // Clean up monitoring
+    removeServiceMonitoring($serviceId);
+    
+    // Cancel scheduled tasks
+    cancelScheduledTasks($serviceId);
+    
+    // Release resources
+    releaseServiceResources($serviceId);
+    
     return [
-        'server_online' => $serverStatus['online'],
-        'server_load' => $serverStatus['load'],
-        'disk_usage' => $usage['disk'],
-        'bandwidth_usage' => $usage['bandwidth'],
-        'recent_activity' => $activity,
-        'custom_buttons' => [
-            [
-                'label' => 'Reboot Server',
-                'url' => 'cmd.php?action=reboot&id=' . $serviceId,
-                'confirm' => 'Are you sure you want to reboot?',
-            ],
-            [
-                'label' => 'Console Access',
-                'url' => 'cmd.php?action=console&id=' . $serviceId,
-                'target' => '_blank',
-            ],
-        ],
+        'success' => true,
+        'backup_created' => $backupResult['success'] ?? false,
     ];
 });
 
-/**
- * Get server status from provider
- */
-function getServerStatus(int $serviceId): array
+function createTerminationBackup(int $serviceId): array
 {
-    $service = Capsule::table('tblhosting')
-        ->where('id', $serviceId)
-        ->first();
-
-    // API call to get real-time status
-    $api = new ProviderApi($service->server);
-    $status = $api->getStatus($service->dedicatedip);
-
+    $service = Capsule::table('tblhosting')->where('id', $serviceId)->first();
+    $backupPath = "/backups/services/{$serviceId}/termination_" . date('Ymd');
+    
     return [
-        'online' => $status['online'] ?? false,
-        'load' => $status['load'] ?? '0.00',
-        'uptime' => $status['uptime'] ?? 0,
+        'success' => true,
+        'backup_path' => $backupPath,
     ];
 }
 ```
 
----
-
-## Scheduled Service Hooks
-
-### Daily Service Maintenance
+### Service Renewed Hook
 
 ```php
 <?php
-/**
- * DailyCronJob hook
- * Execute daily service maintenance tasks
- */
-
-add_hook('DailyCronJob', 1, function($vars) {
-    // Example 1: Check expiring services
-    $expiringServices = Capsule::table('tblhosting')
-        ->where('nextduedate', date('Y-m-d', strtotime('+3 days')))
-        ->where('domainstatus', 'Active')
-        ->get();
-
-    foreach ($expiringServices as $service) {
-        // Send reminder
-        sendExpirationReminder($service);
-    }
-
-    // Example 2: Process overdue services
-    $overdueServices = Capsule::table('tblhosting')
-        ->where('domainstatus', 'Active')
-        ->where('nextduedate', '<', date('Y-m-d', strtotime('-7 days')))
-        ->get();
-
-    foreach ($overdueServices as $service) {
-        // Grace period has passed, initiate suspension
-        if (!$service->suspension_date) {
-            initiateServiceSuspension($service);
-        }
-    }
-
-    // Example 3: Clean up terminated services
-    Capsule::table('tblhosting')
-        ->where('domainstatus', 'Terminated')
-        ->where('termination_date', '<', date('Y-m-d', strtotime('-30 days')))
-        ->delete();
-
-    // Example 4: Generate usage reports
-    generateBandwidthReports();
-    generateDiskUsageReports();
+// Triggered when a service is renewed
+add_hook('ServiceRenewed', 1, function(array $vars) {
+    $serviceId = $vars['service_id'];
+    $newDueDate = $vars['nextduedate'];
+    $billingCycle = $vars['billingcycle'];
+    
+    // Update service expiration
+    updateServiceExpiration($serviceId, $newDueDate);
+    
+    // Extend SSL certificates
+    extendSSLCertificates($serviceId);
+    
+    // Reset usage counters
+    resetUsageCounters($serviceId);
+    
+    // Update monitoring
+    extendMonitoringSubscription($serviceId);
+    
+    // Send renewal confirmation
+    sendRenewalConfirmation($serviceId);
+    
+    return ['success' => true];
 });
-
-/**
- * Send expiration reminder
- */
-function sendExpirationReminder($service): void
-{
-    $client = Capsule::table('tblclients')
-        ->where('id', $service->userid)
-        ->first();
-
-    send_email([
-        'type' => 'product',
-        'id' => $service->packageid,
-        'customvars' => [
-            'service_domain' => $service->domain,
-            'expiry_date' => $service->nextduedate,
-            'renewal_url' => getRenewalUrl($service->id),
-        ],
-    ], $client->id);
-}
 ```
 
----
+## Comprehensive Service Handler
+
+```php
+<?php
+class ServiceHookHandler {
+    
+    public function register(): void
+    {
+        add_hook('ServiceCreated', 1, [$this, 'handleServiceCreated']);
+        add_hook('ServiceUpdated', 1, [$this, 'handleServiceUpdated']);
+        add_hook('ServiceSuspended', 1, [$this, 'handleSuspended']);
+        add_hook('ServiceUnsuspended', 1, [$this, 'handleUnsuspended']);
+        add_hook('ServiceTerminated', 1, [$this, 'handleTerminated']);
+        add_hook('ServiceRenewed', 1, [$this, 'handleRenewed']);
+    }
+    
+    public function handleServiceCreated(array $vars): array
+    {
+        $this->initializeService($vars['service_id']);
+        $this->setupMonitoring($vars['service_id']);
+        $this->scheduleTasks($vars['service_id']);
+        return ['success' => true];
+    }
+    
+    public function handleServiceUpdated(array $vars): array
+    {
+        $this->logChanges($vars['service_id'], $vars['changes'] ?? []);
+        $this->syncToServer($vars['service_id'], $vars['changes'] ?? []);
+        return ['success' => true];
+    }
+    
+    public function handleSuspended(array $vars): array
+    {
+        $this->logSuspension($vars['service_id'], $vars['suspend_reason'] ?? '');
+        $this->disableMonitoring($vars['service_id']);
+        $this->notifySuspension($vars['service_id']);
+        return ['success' => true];
+    }
+    
+    public function handleUnsuspended(array $vars): array
+    {
+        $this->logUnsuspension($vars['service_id']);
+        $this->enableMonitoring($vars['service_id']);
+        $this->notifyUnsuspension($vars['service_id']);
+        return ['success' => true];
+    }
+    
+    public function handleTerminated(array $vars): array
+    {
+        $this->createBackup($vars['service_id']);
+        $this->archiveData($vars['service_id']);
+        $this->notifyTermination($vars['service_id']);
+        return ['success' => true];
+    }
+    
+    public function handleRenewed(array $vars): array
+    {
+        $this->updateExpiration($vars['service_id'], $vars['nextduedate']);
+        $this->resetUsage($vars['service_id']);
+        $this->notifyRenewal($vars['service_id']);
+        return ['success' => true];
+    }
+    
+    private function initializeService(int $serviceId): void
+    {
+        Capsule::table('mod_service_meta')->insert([
+            'service_id' => $serviceId,
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+    
+    private function setupMonitoring(int $serviceId): void
+    {
+        Capsule::table('mod_monitoring')->insert([
+            'service_id' => $serviceId,
+            'enabled' => true,
+        ]);
+    }
+    
+    private function scheduleTasks(int $serviceId): void
+    {
+        // Schedule maintenance tasks
+    }
+    
+    private function logChanges(int $serviceId, array $changes): void
+    {
+        Capsule::table('mod_service_audit')->insert([
+            'service_id' => $serviceId,
+            'action' => 'updated',
+            'changes' => json_encode($changes),
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+    
+    private function syncToServer(int $serviceId, array $changes): void
+    {
+        // Sync changes to server
+    }
+    
+    private function logSuspension(int $serviceId, string $reason): void
+    {
+        Capsule::table('mod_service_audit')->insert([
+            'service_id' => $serviceId,
+            'action' => 'suspended',
+            'reason' => $reason,
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+    
+    private function logUnsuspension(int $serviceId): void
+    {
+        Capsule::table('mod_service_audit')->insert([
+            'service_id' => $serviceId,
+            'action' => 'unsuspended',
+            'created_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+    
+    private function disableMonitoring(int $serviceId): void
+    {
+        Capsule::table('mod_monitoring')
+            ->where('service_id', $serviceId)
+            ->update(['enabled' => false]);
+    }
+    
+    private function enableMonitoring(int $serviceId): void
+    {
+        Capsule::table('mod_monitoring')
+            ->where('service_id', $serviceId)
+            ->update(['enabled' => true]);
+    }
+    
+    private function notifySuspension(int $serviceId): void
+    {
+        // Send suspension notification
+    }
+    
+    private function notifyUnsuspension(int $serviceId): void
+    {
+        // Send unsuspension notification
+    }
+    
+    private function createBackup(int $serviceId): void
+    {
+        // Create final backup
+    }
+    
+    private function archiveData(int $serviceId): void
+    {
+        // Archive service data
+    }
+    
+    private function notifyTermination(int $serviceId): void
+    {
+        // Send termination notification
+    }
+    
+    private function updateExpiration(int $serviceId, string $newDate): void
+    {
+        Capsule::table('tblhosting')
+            ->where('id', $serviceId)
+            ->update(['nextduedate' => $newDate]);
+    }
+    
+    private function resetUsage(int $serviceId): void
+    {
+        Capsule::table('mod_service_usage')
+            ->where('service_id', $serviceId)
+            ->update(['reset_at' => date('Y-m-d H:i:s')]);
+    }
+    
+    private function notifyRenewal(int $serviceId): void
+    {
+        // Send renewal notification
+    }
+}
+
+$handler = new ServiceHookHandler();
+$handler->register();
+```
 
 ## Best Practices
 
-1. **Always log actions** - Track all service lifecycle events
-2. **Handle failures gracefully** - Use try-catch and transaction rollback
-3. **Async heavy operations** - Queue long-running tasks
-4. **Notify appropriately** - Keep clients informed
-5. **Maintain audit trail** - Record who did what and when
-6. **Test thoroughly** - Test each lifecycle scenario
-7. **Consider reversibility** - Plan for rollback scenarios
-
----
+1. **Handle provisioning asynchronously** - Don't block on external calls
+2. **Maintain audit logs** - Track all service state changes
+3. **Use transactions** - Ensure data consistency
+4. **Implement rollback** - Be able to undo changes if needed
+5. **Queue notifications** - Send emails in background
 
 ## Related Documentation
 
-- [Hook System Reference](whmcs-hook-system.md)
-- [Hooks Reference](hooks-reference.md)
-- [Lifecycle Management](../skills/whmcs-lifecycle-management.md)
-- [Service Billing](../skills/whmcs-service-billing.md)
+- [WHMCS Order Hooks](/docs/whmcs-order-hooks.md)
+- [WHMCS Provisioning Module Development](/docs/whmcs-provisioning-dev.md)
